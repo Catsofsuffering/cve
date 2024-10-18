@@ -21,7 +21,7 @@ jobs:
           UPDATES=$(git log HEAD..origin/main --oneline)
           if [ -n "$UPDATES" ]; then
             echo "New updates detected. Forking repository."
-            gh repo fork trickest/cve --clone=true --remote=true
+            git merge upstream/main --allow-unrelated-histories --no-edit
           else
             echo "No updates detected."
             exit 0
