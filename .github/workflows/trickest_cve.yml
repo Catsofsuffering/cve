@@ -1,14 +1,14 @@
 name: Trickest CVE Monitor And Deploy
-permissions:
-  contents: write
 on:
   schedule:
-    - cron: '0 * * * *' # 每小时检查一次
+    - cron: "0 * * * *" # 每小时检查一次
   workflow_dispatch:
 
 jobs:
   monitor-fork:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Check out this repository
         uses: actions/checkout@v4
@@ -33,6 +33,16 @@ jobs:
           mkdir docs
           rsync -av --include='[0-9][0-9][0-9][0-9]/' --include='[0-9][0-9][0-9][0-9]/*.md' --exclude='*' --exclude="docs/" --exclude="summary_html/"  . docs/
           echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/docs/README.html" /></head></html>' > index.html
+
+      - name: Generate Docsify Sidebar
+        uses: if-nil/docsify-file-catalog-action@main # 使用action生成_sidebar.md文件并推送到仓库内
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }} # GITHUB_TOKEN 需要有写权限
+          include: 'docs/.*'
+
+      - name: Move Sidebar to doc dir
+        run: |
+          mv _sidebar.md docs/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
