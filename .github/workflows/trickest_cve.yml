@@ -37,7 +37,6 @@ jobs:
     steps:
       - name: Generate Docsify Site
         run: |
-          cd trickest-cve
           mkdir docs
           rsync -av --include='[0-9][0-9][0-9][0-9]/' --include='[0-9][0-9][0-9][0-9]/*.md' --exclude='*' --exclude="docs/" --exclude="summary_html/"  . docs/
           echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/docs/README.html" /></head></html>' > index.html
