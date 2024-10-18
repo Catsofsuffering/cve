@@ -13,19 +13,14 @@ jobs:
       - name: Check out this repository
         uses: actions/checkout@v4
 
-      - name: Check for updates in upstream repository
-        run: |
-          git clone https://github.com/trickest/cve trickest-cve
-          cd trickest-cve
-          git fetch
-          UPDATES=$(git log HEAD..origin/main --oneline)
-          if [ -n "$UPDATES" ]; then
-            echo "New updates detected. Forking repository."
-            git merge upstream/main --allow-unrelated-histories --no-edit
-          else
-            echo "No updates detected."
-            exit 0
-          fi
+      - name: Sync Fork
+        uses: tgymnich/fork-sync@v2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repo: cve
+          owner: trickest
+          base: main
+          head: main
 
       - name: Generate Docsify Site
         run: |
