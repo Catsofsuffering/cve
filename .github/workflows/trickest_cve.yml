@@ -5,23 +5,36 @@ on:
   workflow_dispatch:
 
 jobs:
-  monitor-fork:
+  sync_with_upstream:
+    name: Sync with Upstream
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    if: ${{ github.event.repository.fork }}
+
     steps:
-      - name: Check out this repository
+      - name: Checkout target repo
         uses: actions/checkout@v4
 
-      - name: Sync Fork
-        uses: tgymnich/fork-sync@v2.0
+      - name: Sync Upstream
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repo: cve
-          owner: trickest
-          base: main
-          head: main
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+          upstream_sync_repo: trickest/cve
+          upstream_sync_branch: main
+          target_sync_branch: main
+          test_mode: false
 
+      - name: Check for Failure
+        if: failure()
+        run: |
+          echo "[Error] Due to a change in the workflow file of the upstream repository, GitHub has automatically suspended the scheduled automatic update. You need to manually sync your fork."
+          exit 1
+
+  deploy_cve_poc_md:
+    name: Sync with Upstream
+    runs-on: ubuntu-latest
+    needs: sync_with_upstream
+
+    steps:
       - name: Generate Docsify Site
         run: |
           cd trickest-cve
@@ -30,10 +43,10 @@ jobs:
           echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/docs/README.html" /></head></html>' > index.html
 
       - name: Generate Docsify Sidebar
-        uses: if-nil/docsify-file-catalog-action@main # 使用action生成_sidebar.md文件并推送到仓库内
+        uses: if-nil/docsify-file-catalog-action@main
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # GITHUB_TOKEN 需要有写权限
-          include: 'docs/.*'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          include: "docs/.*"
 
       - name: Move Sidebar to doc dir
         run: |
