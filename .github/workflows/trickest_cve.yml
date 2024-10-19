@@ -34,13 +34,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: sync_with_upstream
     steps:
-      - name: Set up Python
-        uses: actions/setup-python@v3
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11.4' 
-
-      - name: Run Python script
-        run: python ./mkdocs_yaml_gen.py
+          python-version: '3.12' 
+      - run: python mkdocs_yaml_gen.py
 
   deploy_cve_poc_md:
     name: Deploy the CVE markdown
