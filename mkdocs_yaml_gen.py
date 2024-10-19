@@ -34,8 +34,7 @@ config = {
         "admonition"
     ],
     "plugins": [
-        "search",
-        "mkdocs-mermaid2-plugin"
+        "search"
     ],
     "extra_css": [
         "stylesheets/extra.css"
