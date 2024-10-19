@@ -23,29 +23,35 @@ jobs:
           target_sync_branch: main
           test_mode: false
 
+      # - name: Debug environment
+      #   run: |
+      #     echo "Working directory: $(pwd)"
+      #     echo "Files in the working directory:"
+      #     ls -la
+      #     # echo "Environment variables:"
+      #     # env
+
       - name: Check for Failure
         if: failure()
         run: |
           echo "[Error] Due to a change in the workflow file of the upstream repository, GitHub has automatically suspended the scheduled automatic update. You need to manually sync your fork."
           exit 1
 
-  generate_mkdocs_yaml:
-    name: Generate Mkdocs Yaml File
-    runs-on: ubuntu-latest
-    needs: sync_with_upstream
-    steps:
-      - uses: actions/setup-python@v5
+      - name: Generate Mkdocs Yaml File
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12' 
-      - run: python mkdocs_yaml_gen.py
+            python-version: '3.12' 
+      - run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+          python mkdocs_yaml_gen.py
 
-  deploy_cve_poc_md:
-    name: Deploy the CVE markdown
-    runs-on: ubuntu-latest
-    needs: sync_with_upstream
+      # - name: Install rsync
+      #   run: |
+      #     apt-get update
+      #     apt-get install -y rsync
 
-    steps:
-      - name: Generate Docsify Site
+      - name: Conver Markdown to Site
         run: |
           mkdir docs
           rsync -av --include='[0-9][0-9][0-9][0-9]/' --include='[0-9][0-9][0-9][0-9]/*.md' --exclude='*' --exclude="docs/" --exclude="summary_html/"  . docs/
