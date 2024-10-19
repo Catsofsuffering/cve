@@ -53,11 +53,6 @@ jobs:
           mkdir docs
           rsync -av --include='[0-9][0-9][0-9][0-9]/' --include='[0-9][0-9][0-9][0-9]/*.md' --exclude='*' --exclude="docs/" --exclude="summary_html/"  . docs/
           echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/docs/README.html" /></head></html>' > index.html
-
-  build:
-    name: Deploy docs
-    runs-on: ubuntu-latest
-    steps:
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
         # Or use mhausenblas/mkdocs-deploy-gh-pages@nomaterial to build without the mkdocs-material theme
